@@ -1,0 +1,10 @@
+package com.peltops.nestling.dto;
+
+public enum CommonError {
+    INVALID_API,
+    INVALID_MSG_FORMAT,
+    INVALID_QUERY_PARAM,
+    MANDATORY_QUERY_PARAM_INCORRECT,
+    OPTIONAL_QUERY_PARAM_INCORRECT,
+    MANDATORY_QUERY_PARAM_MISSING;
+}
