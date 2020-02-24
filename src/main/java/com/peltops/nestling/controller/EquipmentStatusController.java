@@ -6,6 +6,7 @@ import com.peltops.nestling.service.EquipmentStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,13 +16,14 @@ import javax.validation.constraints.Pattern;
 import java.util.Optional;
 
 @RestController
+@RequestMapping("${nestling.prefix}/n5g-eir-eic/v1")
 @RequiredArgsConstructor
 @Validated
 public class EquipmentStatusController {
 
     private final EquipmentStatusService equipmentStatusService;
 
-    @GetMapping("${nestling.prefix}/n5g-eir-eic/v1")
+    @GetMapping("/equipment-status")
     public EirResponseData getEquipmentStatus(@NotNull @Valid
                                               @Pattern(regexp = "^imei-[0-9]{15}|imeisv-[0-9]{16}|mac-([0-9a-fA-F]{2})((-[0-9a-fA-F]{2}){5})$")
                                               @RequestParam(value = "pei", required = true)

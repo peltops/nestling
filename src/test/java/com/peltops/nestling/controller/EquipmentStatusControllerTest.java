@@ -7,6 +7,7 @@ import com.peltops.nestling.dto.InvalidParam;
 import com.peltops.nestling.dto.ProblemDetails;
 import com.peltops.nestling.entity.EquipmentStatus;
 import com.peltops.nestling.service.EquipmentStatusService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +19,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static com.peltops.nestling.util.ResponseBodyMatchers.responseBody;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,12 +42,19 @@ public class EquipmentStatusControllerTest {
     @Value("${nestling.prefix}")
     private String prefix;
 
+    private String operationName;
+
     @Autowired
     private ObjectMapper objectMapper;
 
+    @BeforeEach
+    public void setup() {
+        operationName = prefix + "/n5g-eir-eic/v1/equipment-status";
+    }
+
     @Test
     public void shouldReturnOK200ForValidImei() throws Exception {
-        mockMvc.perform(get(prefix + "/n5g-eir-eic/v1")
+        mockMvc.perform(get(operationName)
                         .contentType("application/json")
                         .param("pei", "imei-012345678901234"))
                 .andExpect(status().isOk());
@@ -53,7 +62,7 @@ public class EquipmentStatusControllerTest {
 
     @Test
     public void shouldReturnOK200ForValidImeisv() throws Exception {
-        mockMvc.perform(get(prefix + "/n5g-eir-eic/v1")
+        mockMvc.perform(get(operationName)
                 .contentType("application/json")
                 .param("pei", "imeisv-0123456789012345"))
                 .andExpect(status().isOk());
@@ -61,7 +70,7 @@ public class EquipmentStatusControllerTest {
 
     @Test
     public void shouldReturnOK200ForValidMac() throws Exception {
-        mockMvc.perform(get(prefix + "/n5g-eir-eic/v1")
+        mockMvc.perform(get(operationName)
                 .contentType("application/json")
                 .param("pei", "mac-00-00-5E-00-53-00"))
                 .andExpect(status().isOk());
@@ -77,7 +86,7 @@ public class EquipmentStatusControllerTest {
         ProblemDetails expected = new ProblemDetails();
         expected.setCause(CommonError.MANDATORY_QUERY_PARAM_MISSING.toString());
         expected.setInvalidParams(invalidParamList);
-        MvcResult result = mockMvc.perform(get(prefix + "/n5g-eir-eic/v1")
+        MvcResult result = mockMvc.perform(get(operationName)
                 .contentType("application/json"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
@@ -95,7 +104,7 @@ public class EquipmentStatusControllerTest {
     public void shouldReturnWhitelistedWithValidPeiNullSupiNullGpsi() throws Exception {
         when(equipmentStatusService.getEquipmentStatus(any(String.class), isNull(), isNull()))
                 .thenReturn(EquipmentStatus.WHITELISTED);
-        MvcResult result = mockMvc.perform(get(prefix + "/n5g-eir-eic/v1")
+        MvcResult result = mockMvc.perform(get(operationName)
                 .contentType("application/json")
                 .param("pei", "imei-012345678901234"))
                 .andExpect(status().isOk())
@@ -108,7 +117,7 @@ public class EquipmentStatusControllerTest {
         expectedData.setStatus(EquipmentStatus.WHITELISTED);
         when(equipmentStatusService.getEquipmentStatus(any(String.class), isNull(), isNull()))
                 .thenReturn(EquipmentStatus.WHITELISTED);
-        MvcResult result = mockMvc.perform(get(prefix + "/n5g-eir-eic/v1")
+        MvcResult result = mockMvc.perform(get(operationName)
                 .contentType("application/json")
                 .param("pei", "imei-012345678901234"))
                 .andExpect(status().isOk())
@@ -122,7 +131,7 @@ public class EquipmentStatusControllerTest {
         expectedData.setStatus(EquipmentStatus.BLACKLISTED);
         when(equipmentStatusService.getEquipmentStatus(any(String.class), isNull(), isNull()))
                 .thenReturn(EquipmentStatus.BLACKLISTED);
-        MvcResult result = mockMvc.perform(get(prefix + "/n5g-eir-eic/v1")
+        MvcResult result = mockMvc.perform(get(operationName)
                 .contentType("application/json")
                 .param("pei", "imei-012345678901234"))
                 .andExpect(status().isOk())
@@ -136,7 +145,7 @@ public class EquipmentStatusControllerTest {
         expectedData.setStatus(EquipmentStatus.GRAYLISTED);
         when(equipmentStatusService.getEquipmentStatus(any(String.class), isNull(), isNull()))
                 .thenReturn(EquipmentStatus.GRAYLISTED);
-        MvcResult result = mockMvc.perform(get(prefix + "/n5g-eir-eic/v1")
+        MvcResult result = mockMvc.perform(get(operationName)
                 .contentType("application/json")
                 .param("pei", "imei-012345678901234"))
                 .andExpect(status().isOk())
@@ -146,7 +155,7 @@ public class EquipmentStatusControllerTest {
 
     @Test
     public void shouldReturnBadRequest400ForInValidImei() throws Exception {
-        mockMvc.perform(get(prefix + "/n5g-eir-eic/v1")
+        mockMvc.perform(get(operationName)
                 .contentType("application/json")
                 .param("pei", "imei-01234567890123"))
                 .andExpect(status().isBadRequest())
@@ -155,7 +164,7 @@ public class EquipmentStatusControllerTest {
 
     @Test
     public void shouldReturnBadRequest400ForInValidImeisv() throws Exception {
-        mockMvc.perform(get(prefix + "/n5g-eir-eic/v1")
+        mockMvc.perform(get(operationName)
                 .contentType("application/json")
                 .param("pei", "imeisv-012345678901234"))
                 .andExpect(status().isBadRequest());
@@ -163,7 +172,7 @@ public class EquipmentStatusControllerTest {
 
     @Test
     public void shouldReturnBadRequest400ForInValidMac() throws Exception {
-        mockMvc.perform(get(prefix + "/n5g-eir-eic/v1")
+        mockMvc.perform(get(operationName)
                 .contentType("application/json")
                 .param("pei", "mac-012345678901234"))
                 .andExpect(status().isBadRequest());
@@ -171,8 +180,28 @@ public class EquipmentStatusControllerTest {
 
     @Test
     public void shouldReturnBadRequest404ForMissingPei() throws Exception {
-        mockMvc.perform(get(prefix + "/n5g-eir-eic/v1")
+        mockMvc.perform(get(operationName)
                 .contentType("application/json"))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void shouldReturnNotFound() throws Exception {
+        InvalidParam invalidParam = new InvalidParam();
+        invalidParam.setParam("query: pei");
+        List<InvalidParam> invalidParamList = new ArrayList<InvalidParam>();
+        invalidParamList.add(invalidParam);
+        ProblemDetails expected = new ProblemDetails();
+        expected.setDetail("ERROR_EQUIPMENT_UNKNOWN");
+        expected.setInvalidParams(invalidParamList);
+        when(equipmentStatusService.getEquipmentStatus(any(String.class), isNull(), isNull()))
+                .thenThrow(NoSuchElementException.class);
+        MvcResult result = mockMvc.perform(get(operationName)
+                .contentType("application/json")
+                .param("pei", "imei-012345678901234"))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(responseBody().containsObjectAsJson(expected, ProblemDetails.class))
+                .andReturn();
     }
 }

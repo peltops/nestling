@@ -3,6 +3,8 @@ package com.peltops.nestling.controller;
 import com.peltops.nestling.dto.CommonError;
 import com.peltops.nestling.dto.InvalidParam;
 import com.peltops.nestling.dto.ProblemDetails;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -13,6 +15,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @ControllerAdvice
 public class EquipmentStatusControllerAdvice {
@@ -46,5 +49,21 @@ public class EquipmentStatusControllerAdvice {
         return ResponseEntity.badRequest().
                 contentType(MediaType.APPLICATION_PROBLEM_JSON).
                 body(problemDetails);
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<ProblemDetails> onNoSuchElementException(NoSuchElementException e) {
+        ProblemDetails problemDetails = new ProblemDetails();
+        List<InvalidParam> invalidParamList = new ArrayList<InvalidParam>();
+        InvalidParam invalidParam = new InvalidParam();
+        invalidParam.setParam("query: pei");
+        invalidParam.setReason(e.getMessage());
+        invalidParamList.add(invalidParam);
+        problemDetails.setDetail("ERROR_EQUIPMENT_UNKNOWN");
+        problemDetails.setInvalidParams(invalidParamList);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_PROBLEM_JSON);
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        return new ResponseEntity<>(problemDetails, httpHeaders, HttpStatus.NOT_FOUND);
     }
 }

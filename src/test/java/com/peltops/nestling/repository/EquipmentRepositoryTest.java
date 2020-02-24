@@ -13,9 +13,10 @@ import org.springframework.test.context.ActiveProfiles;
 import javax.persistence.EntityManager;
 import javax.sql.DataSource;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -62,12 +63,21 @@ public class EquipmentRepositoryTest {
     }
 
     @Test
-    public void shouldFindAndEquipment() {
+    public void shouldFindAnEquipment() {
         Optional<Equipment> foundEquipment = equipmentRepository.findByPei(pei);
         assertThat(foundEquipment.isPresent()).isTrue();
         assertThat(equipmentRepository.findByPei(pei)).isNotNull();
         assertThat(foundEquipment.get().getPei()).isEqualTo(pei);
         assertThat(foundEquipment.get().getStatus()).isEqualTo(EquipmentStatus.WHITELISTED);
+    }
+
+    @Test
+    public void shouldNotFindAnEquipment() {
+        String noSuchThing = "no-such-thing";
+        Optional<Equipment> foundEquipment = equipmentRepository.findByPei(noSuchThing);
+        assertThat(foundEquipment.isPresent()).isFalse();
+        assertThat(equipmentRepository.findByPei(noSuchThing)).isNotNull();
+        assertThatThrownBy(() -> equipmentRepository.findByPei(noSuchThing).get()).isInstanceOf(NoSuchElementException.class);
     }
 
 }
