@@ -1,6 +1,7 @@
 package com.peltops.nestling.entity;
 
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,6 +11,7 @@ import javax.validation.constraints.NotBlank;
 
 @Entity
 @Data
+@RequiredArgsConstructor
 public class Equipment {
 
     @Id

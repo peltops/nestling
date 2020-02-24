@@ -7,5 +7,5 @@ import java.util.Optional;
 
 public interface EquipmentRepository extends CrudRepository<Equipment, Long> {
 
-    public Optional<Equipment> findByPei(String pei);
+    Optional<Equipment> findByPei(String pei);
 }

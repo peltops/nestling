@@ -2,6 +2,7 @@ package com.peltops.nestling.repository;
 
 import com.peltops.nestling.entity.Equipment;
 import com.peltops.nestling.entity.EquipmentStatus;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -11,6 +12,8 @@ import org.springframework.test.context.ActiveProfiles;
 
 import javax.persistence.EntityManager;
 import javax.sql.DataSource;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,6 +34,18 @@ public class EquipmentRepositoryTest {
     @Autowired
     private EquipmentRepository equipmentRepository;
 
+    private Equipment equipment;
+
+    private String pei = "imei-012345678901234";
+
+    @BeforeEach
+    public void setup() {
+        equipment = new Equipment();
+        equipment.setPei(pei);
+        equipment.setStatus(EquipmentStatus.WHITELISTED);
+        equipment = equipmentRepository.save(equipment);
+    }
+
     @Test
     public void checkComponents() {
         assertThat(dataSource).isNotNull();
@@ -41,13 +56,18 @@ public class EquipmentRepositoryTest {
 
     @Test
     public void shouldCreateAnEquipment() {
-        Equipment equipment = new Equipment();
-        equipment.setPei("imei-012345678901234");
-        equipment.setStatus(EquipmentStatus.WHITELISTED);
+        assertThat(equipmentRepository.findByPei(pei)).isNotNull();
+        assertThat(equipment.getPei()).isEqualTo(pei);
+        assertThat(equipment.getStatus()).isEqualTo(EquipmentStatus.WHITELISTED);
+    }
 
-        equipment = equipmentRepository.save(equipment);
-        System.err.println(equipment);
-
+    @Test
+    public void shouldFindAndEquipment() {
+        Optional<Equipment> foundEquipment = equipmentRepository.findByPei(pei);
+        assertThat(foundEquipment.isPresent()).isTrue();
+        assertThat(equipmentRepository.findByPei(pei)).isNotNull();
+        assertThat(foundEquipment.get().getPei()).isEqualTo(pei);
+        assertThat(foundEquipment.get().getStatus()).isEqualTo(EquipmentStatus.WHITELISTED);
     }
 
 }
